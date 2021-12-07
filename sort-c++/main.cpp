@@ -22,7 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <fstream>
-#include <io.h>    // to check file existence using POSIX function access(). On Linux include <unistd.h>.
+#include <unistd.h>
+//#include <io.h>    // to check file existence using POSIX function access(). On Linux include <unistd.h>.
 #include <iomanip> // to format image names using setw() and setfill()
 #include <iostream>
 #include <set>
@@ -33,9 +34,10 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
-typedef struct TrackingBox {
-    int frame;
-    int id;
+typedef struct _TrackingBox {
+    _TrackingBox() : box(0, 0, 0, 0) {}
+    int frame{0};
+    int id{0};
     cv::Rect_<float> box;
 } TrackingBox;
 
@@ -45,14 +47,15 @@ double GetIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt)
     float in = (bb_test & bb_gt).area();
     float un = bb_test.area() + bb_gt.area() - in;
 
-    if (un < DBL_EPSILON)
+    if (un < DBL_EPSILON) {
         return 0;
+    }
 
-    return (double)(in / un);
+    return static_cast<double>(in / un);
 }
 
 // global variables for counting
-#define CNUM 20
+constexpr int CNUM = 20;
 int total_frames = 0;
 double total_time = 0.0;
 
@@ -63,14 +66,15 @@ int main()
     std::vector<std::string> sequences = {"PETS09-S2L1",  "TUD-Campus",    "TUD-Stadtmitte", "ETH-Bahnhof",
                                           "ETH-Sunnyday", "ETH-Pedcross2", "KITTI-13",       "KITTI-17",
                                           "ADL-Rundle-6", "ADL-Rundle-8",  "Venice-2"};
-    for (auto seq : sequences)
+    for (auto seq : sequences) {
         TestSORT(seq, false);
+    }
     // TestSORT("PETS09-S2L1", true);
 
     // Note: time counted here is of tracking procedure, while the running speed bottleneck is opening and parsing
     // detectionFile.
     std::cout << "Total Tracking took: " << total_time << " for " << total_frames << " frames or "
-              << ((double)total_frames / (double)total_time) << " FPS" << std::endl;
+              << (static_cast<double>(total_frames) / static_cast<double>(total_time)) << " FPS" << std::endl;
 
     return 0;
 }
@@ -80,18 +84,11 @@ void TestSORT(std::string seqName, bool display)
     std::cout << "Processing " << seqName << "..." << std::endl;
 
     // 0. randomly generate colors, only for display
-    cv::RNG rng(0xFFFFFFFF);
+    cv::RNG rng(0xFFFFFFFF);                    // NOLINT(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
     cv::Scalar_<int> randColor[CNUM];
-    for (int i = 0; i < CNUM; i++)
-        rng.fill(randColor[i], cv::RNG::UNIFORM, 0, 256);
-
-    std::string imgPath = "D:/Data/Track/2DMOT2015/train/" + seqName + "/img1/";
-
-    if (display)
-        if (_access(imgPath.c_str(), 0) == -1) {
-            std::cerr << "Image path not found!" << std::endl;
-            display = false;
-        }
+    for (auto & i : randColor) {
+        rng.fill(i, cv::RNG::UNIFORM, 0, 256);  // NOLINT(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
+    }
 
     // 1. read detection file
     std::ifstream detectionFile;
@@ -303,38 +300,24 @@ void TestSORT(std::string seqName, bool display)
                 res.frame = frame_count;
                 frameTrackingResult.push_back(res);
                 it++;
-            } else
+            } else {
                 it++;
+            }
 
             // remove dead tracklet
-            if (it != trackers.end() && (*it).m_time_since_update > max_age)
+            if (it != trackers.end() && (*it).m_time_since_update > max_age) {
                 it = trackers.erase(it);
+            }
         }
 
-        cycle_time = (double)(cv::getTickCount() - start_time);
+        cycle_time = (cv::getTickCount() - start_time);
         total_time += cycle_time / cv::getTickFrequency();
 
-        for (auto tb : frameTrackingResult)
+        for (auto tb : frameTrackingResult) {
             resultsFile << tb.frame << "," << tb.id << "," << tb.box.x << "," << tb.box.y << "," << tb.box.width << ","
                         << tb.box.height << ",1,-1,-1,-1" << std::endl;
-
-        if (display) // read image, draw results and show them
-        {
-            std::ostringstream oss;
-            oss << imgPath << std::setw(6) << std::setfill('0') << fi + 1;
-            cv::Mat img = cv::imread(oss.str() + ".jpg");
-            if (img.empty())
-                continue;
-
-            for (auto tb : frameTrackingResult)
-                cv::rectangle(img, tb.box, randColor[tb.id % CNUM], 2, 8, 0);
-            cv::imshow(seqName, img);
-            cv::waitKey(40);
         }
     }
 
     resultsFile.close();
-
-    if (display)
-        cv::destroyAllWindows();
 }

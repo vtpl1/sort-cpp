@@ -1,7 +1,17 @@
 {
     "cmake.configureSettings": {
-        // "VCPKG_TARGET_TRIPLET": "x64-linux"
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        // "VCPKG_TARGET_TRIPLET": "x64-windows-static",
         "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/thirdparty/vcpkg/scripts/buildsystems/vcpkg.cmake",
     },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "build/**": true,
+        "thirdparty/**": true
+    },
+    "files.associations": {
+        "cmath": "cpp",
+        "complex": "cpp"
+    }
 }

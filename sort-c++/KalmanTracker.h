@@ -39,8 +39,8 @@ class KalmanTracker
     StateType predict();
     void update(StateType stateMat);
 
-    StateType get_state();
-    StateType get_rect_xysr(float cx, float cy, float s, float r);
+    StateType get_state() const;
+
 
     static int kf_count;
 
@@ -52,6 +52,7 @@ class KalmanTracker
 
   private:
     void init_kf(StateType stateMat);
+    static StateType get_rect_xysr(float cx, float cy, float s, float r);
 
     cv::KalmanFilter kf;
     cv::Mat measurement;

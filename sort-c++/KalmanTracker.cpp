@@ -8,8 +8,8 @@ int KalmanTracker::kf_count = 0;
 // initialize Kalman filter
 void KalmanTracker::init_kf(StateType stateMat)
 {
-    int stateNum = 7;
-    int measureNum = 4;
+    const int stateNum = 7;
+    const int measureNum = 4;
     kf = cv::KalmanFilter(stateNum, measureNum, 0);
 
     measurement = cv::Mat::zeros(measureNum, 1, CV_32F);
@@ -18,8 +18,10 @@ void KalmanTracker::init_kf(StateType stateMat)
                            0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1);
 
     setIdentity(kf.measurementMatrix);
-    setIdentity(kf.processNoiseCov, cv::Scalar::all(1e-2));
-    setIdentity(kf.measurementNoiseCov, cv::Scalar::all(1e-1));
+    setIdentity(kf.processNoiseCov,
+                cv::Scalar::all(1e-2)); // NOLINT(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
+    setIdentity(kf.measurementNoiseCov,
+                cv::Scalar::all(1e-1)); // NOLINT(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
     setIdentity(kf.errorCovPost, cv::Scalar::all(1));
 
     // initialize state vector with bounding box in [cx,cy,s,r] style
@@ -36,8 +38,9 @@ StateType KalmanTracker::predict()
     cv::Mat p = kf.predict();
     m_age += 1;
 
-    if (m_time_since_update > 0)
+    if (m_time_since_update > 0) {
         m_hit_streak = 0;
+    }
     m_time_since_update += 1;
 
     StateType predictBox = get_rect_xysr(p.at<float>(0, 0), p.at<float>(1, 0), p.at<float>(2, 0), p.at<float>(3, 0));
@@ -65,7 +68,7 @@ void KalmanTracker::update(StateType stateMat)
 }
 
 // Return the current state vector
-StateType KalmanTracker::get_state()
+StateType KalmanTracker::get_state() const
 {
     cv::Mat s = kf.statePost;
     return get_rect_xysr(s.at<float>(0, 0), s.at<float>(1, 0), s.at<float>(2, 0), s.at<float>(3, 0));
@@ -79,10 +82,12 @@ StateType KalmanTracker::get_rect_xysr(float cx, float cy, float s, float r)
     float x = (cx - w / 2);
     float y = (cy - h / 2);
 
-    if (x < 0 && cx > 0)
+    if (x < 0 && cx > 0) {
         x = 0;
-    if (y < 0 && cy > 0)
+    }
+    if (y < 0 && cy > 0) {
         y = 0;
+    }
 
     return StateType(x, y, w, h);
 }

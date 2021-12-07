@@ -36,6 +36,14 @@ The speed of this implementation is at about 1800 FPS, or ~3 seconds over 5500 f
 mkdir thirdparty
 cd thirdparty
 git clone https://github.com/Microsoft/vcpkg.git
+```
+
+## Linux
+```
 .\vcpkg\bootstrap-vcpkg.bat
 ```
 
+## Windows
+```
+./vcpkg/bootstrap-vcpkg.sh
+```

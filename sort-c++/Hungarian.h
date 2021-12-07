@@ -15,8 +15,8 @@
 class HungarianAlgorithm
 {
   public:
-    HungarianAlgorithm();
-    ~HungarianAlgorithm();
+    HungarianAlgorithm() = default;
+    ~HungarianAlgorithm() = default;
     double Solve(std::vector<std::vector<double>>& DistMatrix, std::vector<int>& Assignment);
 
   private:
