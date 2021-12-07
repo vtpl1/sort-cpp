@@ -21,8 +21,7 @@
 		"wmaurer.change-case",
 		"ms-vscode.cmake-tools",
 		"ms-python.python",
-		"gruntfuggly.todo-tree",
-		"notskm.clang-tidy"
+		"gruntfuggly.todo-tree"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

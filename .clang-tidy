@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-*,clang-diagnostic-*,clang-analyzer-*,google-*,cppcoreguidelines-*,readability-*,modernize-*,-modernize-use-trailing-return-type,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-cstyle-cast,-cppcoreguidelines-narrowing-conversions,-cppcoreguidelines-avoid-c-arrays,-modernize-avoid-c-arrays'
+Checks:          '*,-modernize-use-trailing-return-type,-misc-unused-parameters,-fuchsia-*,-cppcoreguidelines-pro-bounds-pointer-arithmetic'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

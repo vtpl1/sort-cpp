@@ -188,4 +188,4 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
-sort-c++/output/
+sort-c++/output*/

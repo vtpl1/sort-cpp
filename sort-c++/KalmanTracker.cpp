@@ -8,19 +8,21 @@ int KalmanTracker::kf_count = 0;
 // initialize Kalman filter
 void KalmanTracker::init_kf(StateType stateMat)
 {
-    int stateNum = 7;
-    int measureNum = 4;
-    kf = KalmanFilter(stateNum, measureNum, 0);
+    const int stateNum = 7;
+    const int measureNum = 4;
+    const double one_e_2 = 1e-2;
+    const double one_e_1 = 1e-1;
+    kf = cv::KalmanFilter(stateNum, measureNum, 0);
 
-    measurement = Mat::zeros(measureNum, 1, CV_32F);
+    measurement = cv::Mat::zeros(measureNum, 1, CV_32F);
 
-    kf.transitionMatrix = (Mat_<float>(stateNum, stateNum) << 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0,
+    kf.transitionMatrix = (cv::Mat_<float>(stateNum, stateNum) << 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0,
                            0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1);
 
     setIdentity(kf.measurementMatrix);
-    setIdentity(kf.processNoiseCov, Scalar::all(1e-2));
-    setIdentity(kf.measurementNoiseCov, Scalar::all(1e-1));
-    setIdentity(kf.errorCovPost, Scalar::all(1));
+    setIdentity(kf.processNoiseCov, cv::Scalar::all(one_e_2));
+    setIdentity(kf.measurementNoiseCov, cv::Scalar::all(one_e_1));
+    setIdentity(kf.errorCovPost, cv::Scalar::all(1));
 
     // initialize state vector with bounding box in [cx,cy,s,r] style
     kf.statePost.at<float>(0, 0) = stateMat.x + stateMat.width / 2;
@@ -33,7 +35,7 @@ void KalmanTracker::init_kf(StateType stateMat)
 StateType KalmanTracker::predict()
 {
     // predict
-    Mat p = kf.predict();
+    cv::Mat p = kf.predict();
     m_age += 1;
 
     if (m_time_since_update > 0) {
@@ -66,16 +68,16 @@ void KalmanTracker::update(StateType stateMat)
 }
 
 // Return the current state vector
-StateType KalmanTracker::get_state()
+StateType KalmanTracker::get_state() const
 {
-    Mat s = kf.statePost;
+    cv::Mat s = kf.statePost;
     return get_rect_xysr(s.at<float>(0, 0), s.at<float>(1, 0), s.at<float>(2, 0), s.at<float>(3, 0));
 }
 
 // Convert bounding box from [cx,cy,s,r] to [x,y,w,h] style.
 StateType KalmanTracker::get_rect_xysr(float cx, float cy, float s, float r)
 {
-    float w = sqrt(s * r);
+    float w = sqrtf(s * r);
     float h = s / w;
     float x = (cx - w / 2);
     float y = (cy - h / 2);

@@ -8,6 +8,8 @@ add_executable(sort_cpp
     main.cpp
 )
 
+target_compile_features(sort_cpp INTERFACE cxx_std_14)
+
 target_link_libraries(sort_cpp
     PUBLIC ${OpenCV_LIBS}
 )
