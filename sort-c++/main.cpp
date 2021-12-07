@@ -24,8 +24,8 @@
 #include <fstream>
 #include <iomanip> // to format image names using setw() and setfill()
 #include <iostream>
-#include <unistd.h>
-//#include <io.h>    // to check file existence using POSIX function access(). On Linux include <unistd.h>.
+// #include <unistd.h>
+// #include <io.h>    // to check file existence using POSIX function access(). On Linux include <unistd.h>.
 #include <set>
 
 #include "Hungarian.h"
@@ -63,8 +63,8 @@ void TestSORT(std::string seqName, bool display);
 int main()
 {
     std::vector<std::string> sequences = {"PETS09-S2L1",  "TUD-Campus",    "TUD-Stadtmitte", "ETH-Bahnhof",
-                                "ETH-Sunnyday", "ETH-Pedcross2", "KITTI-13",       "KITTI-17",
-                                "ADL-Rundle-6", "ADL-Rundle-8",  "Venice-2"};
+                                          "ETH-Sunnyday", "ETH-Pedcross2", "KITTI-13",       "KITTI-17",
+                                          "ADL-Rundle-6", "ADL-Rundle-8",  "Venice-2"};
     for (auto seq : sequences) {
         TestSORT(seq, false);
     }
@@ -73,7 +73,7 @@ int main()
     // Note: time counted here is of tracking procedure, while the running speed bottleneck is opening and parsing
     // detectionFile.
     std::cout << "Total Tracking took: " << total_time << " for " << total_frames << " frames or "
-         << (static_cast<double>(total_frames) / static_cast<double>(total_time)) << " FPS" << std::endl;
+              << (static_cast<double>(total_frames) / static_cast<double>(total_time)) << " FPS" << std::endl;
 
     return 0;
 }
@@ -83,10 +83,10 @@ void TestSORT(std::string seqName, bool display)
     std::cout << "Processing " << seqName << "..." << std::endl;
 
     // 0. randomly generate colors, only for display
-    cv::RNG rng(0xFFFFFFFF);                                // NOLINT
+    cv::RNG rng(0xFFFFFFFF); // NOLINT
     cv::Scalar_<int> randColor[CNUM];
     for (int i = 0; i < CNUM; i++) {
-        rng.fill(randColor[i], cv::RNG::UNIFORM, 0, 256);   // NOLINT
+        rng.fill(randColor[i], cv::RNG::UNIFORM, 0, 256); // NOLINT
     }
 
     // 1. read detection file
@@ -146,7 +146,7 @@ void TestSORT(std::string seqName, bool display)
     int frame_count = 0;
     int max_age = 1;
     int min_hits = 3;
-    double iouThreshold = 0.3;      // NOLINT
+    double iouThreshold = 0.3; // NOLINT
     std::vector<KalmanTracker> trackers;
     KalmanTracker::kf_count = 0; // tracking id relies on this, so we have to reset it in each seq.
 
@@ -291,7 +291,7 @@ void TestSORT(std::string seqName, bool display)
         // each prediction is corresponding to a tracker
         int detIdx = 0;
         int trkIdx = 0;
-        for (auto & matchedPair : matchedPairs) {
+        for (auto& matchedPair : matchedPairs) {
             trkIdx = matchedPair.x;
             detIdx = matchedPair.y;
             trackers[trkIdx].update(detFrameData[fi][detIdx].box);

@@ -25,7 +25,6 @@ double HungarianAlgorithm::Solve(std::vector<std::vector<double>>& DistMatrix, s
     // int* assignment = new int[nRows];
     std::vector<double> distMatrixIn(nRows * nCols, 0.0);
     std::vector<int> assignment(nRows, 0);
-
     double cost = 0.0;
 
     // Fill in the distMatrixIn. Mind the index is "i + nRows * j".
@@ -39,7 +38,8 @@ double HungarianAlgorithm::Solve(std::vector<std::vector<double>>& DistMatrix, s
     }
 
     // call solving function
-    assignmentoptimal(&assignment[0], &cost, &distMatrixIn[0], nRows, nCols);
+    assignmentoptimal(assignment.empty() ? nullptr : &assignment[0], &cost,
+                      distMatrixIn.empty() ? nullptr : &distMatrixIn[0], nRows, nCols);
 
     Assignment.clear();
     for (unsigned int r = 0; r < nRows; r++) {
@@ -85,7 +85,7 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
     nOfElements = nOfRows * nOfColumns;
     std::vector<double> distMatrix(nOfElements);
     // distMatrix = (double*)malloc(nOfElements * sizeof(double));
-    distMatrixEnd = &distMatrix[0] + nOfElements;
+    distMatrixEnd = distMatrix.empty() ? nullptr : &distMatrix[0] + nOfElements;
 
     for (row = 0; row < nOfElements; row++) {
         value = distMatrixIn[row];
@@ -114,7 +114,7 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
 
         for (row = 0; row < nOfRows; row++) {
             /* find the smallest element in the row */
-            distMatrixTemp = &distMatrix[0] + row;
+            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + row;
             minValue = *distMatrixTemp;
             distMatrixTemp += nOfRows;
             while (distMatrixTemp < distMatrixEnd) {
@@ -126,7 +126,7 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
             }
 
             /* subtract the smallest element from each element of the row */
-            distMatrixTemp = &distMatrix[0] + row;
+            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + row;
             while (distMatrixTemp < distMatrixEnd) {
                 *distMatrixTemp -= minValue;
                 distMatrixTemp += nOfRows;
@@ -151,7 +151,7 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
 
         for (col = 0; col < nOfColumns; col++) {
             /* find the smallest element in the column */
-            distMatrixTemp = &distMatrix[0] + nOfRows * col;
+            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + nOfRows * col;
             columnEnd = distMatrixTemp + nOfRows;
 
             minValue = *distMatrixTemp++;
@@ -163,7 +163,7 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
             }
 
             /* subtract the smallest element from each element of the column */
-            distMatrixTemp = &distMatrix[0] + nOfRows * col;
+            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + nOfRows * col;
             while (distMatrixTemp < columnEnd) {
                 *distMatrixTemp++ -= minValue;
             }
@@ -188,8 +188,10 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
     }
 
     /* move to step 2b */
-    step2b(assignment, &distMatrix[0], &starMatrix[0], &newStarMatrix[0], &primeMatrix[0], &coveredColumns[0],
-           &coveredRows[0], nOfRows, nOfColumns, minDim);
+    step2b(assignment, distMatrix.empty() ? nullptr : &distMatrix[0], starMatrix.empty() ? nullptr : &starMatrix[0],
+           newStarMatrix.empty() ? nullptr : &newStarMatrix[0], primeMatrix.empty() ? nullptr : &primeMatrix[0],
+           coveredColumns.empty() ? nullptr : &coveredColumns[0], coveredRows.empty() ? nullptr : &coveredRows[0],
+           nOfRows, nOfColumns, minDim);
 
     /* compute cost and remove invalid assignments */
     computeassignmentcost(assignment, cost, distMatrixIn, nOfRows);

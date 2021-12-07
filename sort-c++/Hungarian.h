@@ -20,17 +20,22 @@ class HungarianAlgorithm
     double Solve(std::vector<std::vector<double>>& DistMatrix, std::vector<int>& Assignment);
 
   private:
-    void assignmentoptimal(int* assignment, double* cost, double* distMatrix, int nOfRows, int nOfColumns);
+    static void assignmentoptimal(int* assignment, double* cost, double* distMatrix, int nOfRows, int nOfColumns);
     static void buildassignmentvector(int* assignment, const unsigned char* starMatrix, int nOfRows, int nOfColumns);
     static void computeassignmentcost(const int* assignment, double* cost, const double* distMatrix, int nOfRows);
-    void step2a(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix, unsigned char* primeMatrix,
-                unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows, int nOfColumns, int minDim);
-    void step2b(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix, unsigned char* primeMatrix,
-                unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows, int nOfColumns, int minDim);
-    void step3(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix, unsigned char* primeMatrix,
-               unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows, int nOfColumns, int minDim);
-    void step4(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix, unsigned char* primeMatrix,
-               unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows, int nOfColumns, int minDim, int row, int col);
-    void step5(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix, unsigned char* primeMatrix,
-               unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows, int nOfColumns, int minDim);
+    static void step2a(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix,
+                unsigned char* primeMatrix, unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows,
+                int nOfColumns, int minDim);
+    static void step2b(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix,
+                unsigned char* primeMatrix, unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows,
+                int nOfColumns, int minDim);
+    static void step3(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix,
+               unsigned char* primeMatrix, unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows,
+               int nOfColumns, int minDim);
+    static void step4(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix,
+               unsigned char* primeMatrix, unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows,
+               int nOfColumns, int minDim, int row, int col);
+    static void step5(int* assignment, double* distMatrix, unsigned char* starMatrix, unsigned char* newStarMatrix,
+               unsigned char* primeMatrix, unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows,
+               int nOfColumns, int minDim);
 };
