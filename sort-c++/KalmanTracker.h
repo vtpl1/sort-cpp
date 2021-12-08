@@ -4,8 +4,7 @@
 #ifndef KALMAN_H
 #define KALMAN_H 2
 
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/video/tracking.hpp"
+#include "opencv2/opencv.hpp"
 
 #define StateType cv::Rect_<float>
 
@@ -13,16 +12,6 @@
 class KalmanTracker
 {
   public:
-    KalmanTracker()
-    {
-        init_kf(StateType());
-        m_time_since_update = 0;
-        m_hits = 0;
-        m_hit_streak = 0;
-        m_age = 0;
-        m_id = kf_count;
-        // kf_count++;
-    }
     KalmanTracker(StateType initRect)
     {
         init_kf(initRect);

@@ -5,6 +5,7 @@ find_package( OpenCV REQUIRED )
 add_executable(sort_cpp
     Hungarian.cpp
     KalmanTracker.cpp
+    SortTracker.cpp
     main.cpp
 )
 
