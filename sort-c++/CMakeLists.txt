@@ -8,6 +8,9 @@ add_library(sort_cpp STATIC
     SortTracker.cpp
 )
 
+target_include_directories(sort_cpp
+  PUBLIC inc
+)
 target_link_libraries(sort_cpp
     PUBLIC ${OpenCV_LIBS}
 )
