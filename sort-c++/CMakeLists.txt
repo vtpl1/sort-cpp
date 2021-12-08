@@ -2,14 +2,11 @@ cmake_minimum_required(VERSION 3.17)
 
 find_package( OpenCV REQUIRED )
 
-add_executable(sort_cpp
+add_library(sort_cpp STATIC
     Hungarian.cpp
     KalmanTracker.cpp
     SortTracker.cpp
-    main.cpp
 )
-
-target_compile_features(sort_cpp INTERFACE cxx_std_14)
 
 target_link_libraries(sort_cpp
     PUBLIC ${OpenCV_LIBS}
@@ -17,3 +14,11 @@ target_link_libraries(sort_cpp
 
 set_property(TARGET sort_cpp PROPERTY
   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+add_executable(sort_cpp_exe
+  main.cpp
+)
+
+target_link_libraries(sort_cpp_exe
+    PUBLIC sort_cpp
+)
