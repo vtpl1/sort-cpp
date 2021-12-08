@@ -66,7 +66,7 @@ SortTracker::~SortTracker() { _trackers.clear(); }
 std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::TrackingBox>& tracking_box_vec,
                                                       float rc_ext, int height, int width, bool iou_mod)
 {
-    if (_show_msg) {
+    if (!_show_msg) {
         std::cout << "_max_age :: " << _max_age << "; _min_hits :: " << _min_hits
                   << "; _iou_threshold :: " << _iou_threshold << std::endl;
         std::cout << "Sort_tracker getResult()..." << std::endl;
@@ -148,7 +148,7 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
     std::vector<cv::Point> matchedPairs;
     if (detNum > trkNum) //	there are unmatched detections
     {
-        if (_show_msg) {
+        if (!_show_msg) {
             std::cout << "New Track Object ID ::" << trkNum + 1 << std::endl;
         }
         for (unsigned int n = 0; n < detNum; n++) {
@@ -224,6 +224,9 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
 
         // remove dead tracklet
         if (it != _trackers.end() && (*it).m_time_since_update > _max_age) {
+            if (!_show_msg) {
+				std::cout << "Deleting the trackid::::" << (*it).m_id << std::endl;
+            }
             it = _trackers.erase(it);
         }
     }
