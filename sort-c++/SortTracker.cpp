@@ -215,7 +215,7 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         if (!_show_msg) {
             std::cout << "IT -- " << (*it).m_id << "-- " << (*it).m_time_since_update << std::endl;
         }
-        if ((*it).m_time_since_update > _max_age) {
+        if ((*it).m_time_since_update >= _max_age) {
             // remove dead tracklet
             if (!_show_msg) {
                 std::cout << "Deleting the trackid::::" << (*it).m_id << std::endl;
@@ -224,8 +224,9 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         } else if (((*it).m_time_since_update < 1) && ((*it).m_hit_streak >= _min_hits || _frame_count <= _min_hits)) {
             TrackingBox res;
             res.box = (*it).get_state();
-            res.id = (*it).m_id + 1;
+            res.id = (*it).m_id;
             res.frame = _frame_count;
+            // res.miss_count = (*it).m_time_since_update;
             frameTrackingResult.emplace_back(res);
             it++;
         } else {

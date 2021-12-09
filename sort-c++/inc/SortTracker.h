@@ -12,6 +12,7 @@ typedef struct _TrackingBox {
     int frame{0};
     int id{0};
     cv::Rect_<float> box;
+    // int miss_count{0};
 } TrackingBox;
 
 class SortTracker
