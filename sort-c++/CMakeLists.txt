@@ -25,3 +25,6 @@ add_executable(sort_cpp_exe
 target_link_libraries(sort_cpp_exe
     PUBLIC sort_cpp
 )
+
+set_property(TARGET sort_cpp_exe PROPERTY
+  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
