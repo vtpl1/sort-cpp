@@ -73,21 +73,21 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         std::cout << "Sort_tracker getResult()..." << std::endl;
     }
 
-    if (_trackers.empty()) // the first frame met
-    {
-        // initialize kalman trackers using first detections.
-        int loop_cnt = 0;
-        for (auto&& i : tracking_box_vec) {
-            KalmanTracker trk = KalmanTracker((i).box);
-            _trackers.emplace_back(trk);
-            if (_show_msg) {
-                std::cout << (i).frame << "," << loop_cnt++ << "," << (i).box.x << "," << (i).box.y << ","
-                          << (i).box.width << "," << (i).box.height << std::endl;
-            }
-        }
+    // if (_trackers.empty()) // the first frame met
+    // {
+    //     // initialize kalman trackers using first detections.
+    //     int loop_cnt = 0;
+    //     for (auto&& i : tracking_box_vec) {
+    //         KalmanTracker trk = KalmanTracker((i).box);
+    //         _trackers.emplace_back(trk);
+    //         if (_show_msg) {
+    //             std::cout << (i).frame << "," << loop_cnt++ << "," << (i).box.x << "," << (i).box.y << ","
+    //                       << (i).box.width << "," << (i).box.height << std::endl;
+    //         }
+    //     }
 
-        return std::vector<vtpl::TrackingBox>();
-    }
+    //     return std::vector<vtpl::TrackingBox>();
+    // }
 
     if (_show_msg) {
         for (auto&& i : tracking_box_vec) {
