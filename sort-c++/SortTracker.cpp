@@ -78,11 +78,11 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
     //     // initialize kalman trackers using first detections.
     //     int loop_cnt = 0;
     //     for (auto&& i : tracking_box_vec) {
-    //         KalmanTracker trk = KalmanTracker((i).box);
+    //         KalmanTracker trk = KalmanTracker((i).rect);
     //         _trackers.emplace_back(trk);
     //         if (_show_msg) {
-    //             std::cout << (i).frame << "," << loop_cnt++ << "," << (i).box.x << "," << (i).box.y << ","
-    //                       << (i).box.width << "," << (i).box.height << std::endl;
+    //             std::cout << (i).frame << "," << loop_cnt++ << "," << (i).rect.x << "," << (i).rect.y << ","
+    //                       << (i).rect.width << "," << (i).rect.height << std::endl;
     //         }
     //     }
 
@@ -91,8 +91,8 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
 
     if (_show_msg) {
         for (auto&& i : tracking_box_vec) {
-            std::cout << (i).frame << "," << (i).box.x << "," << (i).box.y << "," << (i).box.width << ","
-                      << (i).box.height << std::endl;
+            std::cout << (i).frame << "," << (i).rect.x << "," << (i).rect.y << "," << (i).rect.width << ","
+                      << (i).rect.height << std::endl;
         }
     }
 
@@ -127,9 +127,9 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         for (unsigned int j = 0; j < detNum; j++) {
             // use 1-iou because the hungarian algorithm computes a minimum-cost assignment.
             if (iou_mod) {
-                iouMatrix[i][j] = 1 - getModIOU(predictedBoxes[i], tracking_box_vec.at(j).box, rc_ext, height, width);
+                iouMatrix[i][j] = 1 - getModIOU(predictedBoxes[i], tracking_box_vec.at(j).rect, rc_ext, height, width);
             } else {
-                iouMatrix[i][j] = 1 - getIOU(predictedBoxes[i], tracking_box_vec.at(j).box);
+                iouMatrix[i][j] = 1 - getIOU(predictedBoxes[i], tracking_box_vec.at(j).rect);
             }
         }
     }
@@ -200,30 +200,30 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
     for (auto& matchedPair : matchedPairs) {
         int trkIdx = matchedPair.x;
         int detIdx = matchedPair.y;
-        _trackers[trkIdx].update(tracking_box_vec.at(detIdx).box);
+        _trackers[trkIdx].update(tracking_box_vec.at(detIdx).rect);
     }
 
     // create and initialise new trackers for unmatched detections
     for (const auto& umd : unmatchedDetections) {
-        KalmanTracker tracker = KalmanTracker(tracking_box_vec.at(umd).box);
+        KalmanTracker tracker = KalmanTracker(tracking_box_vec.at(umd).rect);
         _trackers.emplace_back(tracker);
     }
 
     // get trackers' output
     std::vector<vtpl::TrackingBox> frameTrackingResult;
     for (auto it = _trackers.begin(); it != _trackers.end();) {
-        if (!_show_msg) {
+        if (_show_msg) {
             std::cout << "IT -- " << (*it).m_id << "-- " << (*it).m_time_since_update << std::endl;
         }
         if ((*it).m_time_since_update >= _max_age) {
             // remove dead tracklet
-            if (!_show_msg) {
+            if (_show_msg) {
                 std::cout << "Deleting the trackid::::" << (*it).m_id << std::endl;
             }
             it = _trackers.erase(it);
         } else if (((*it).m_time_since_update < 1) && ((*it).m_hit_streak >= _min_hits || _frame_count <= _min_hits)) {
             TrackingBox res;
-            res.box = (*it).get_state();
+            res.rect = (*it).get_state();
             res.id = (*it).m_id;
             res.frame = _frame_count;
             // res.miss_count = (*it).m_time_since_update;
