@@ -9,21 +9,21 @@
 // by Cong Ma, 2016
 //
 
-#include "Hungarian.h"
 #include <cfloat>
 #include <cmath>
 
+#include "Hungarian.h"
 //********************************************************//
 // A single function wrapper for solving assignment problem.
 //********************************************************//
 double HungarianAlgorithm::Solve(std::vector<std::vector<double>>& DistMatrix, std::vector<int>& Assignment)
 {
-    int nRows = DistMatrix.size();
-    int nCols = DistMatrix[0].size();
+    int nRows = static_cast<int>(DistMatrix.size());
+    int nCols = static_cast<int>(DistMatrix[0].size());
 
     // double* distMatrixIn = new double[nRows * nCols];
     // int* assignment = new int[nRows];
-    std::vector<double> distMatrixIn(nRows * nCols, 0.0);
+    std::vector<double> distMatrixIn(static_cast<size_t>(nRows * nCols), 0.0);
     std::vector<int> assignment(nRows, 0);
     double cost = 0.0;
 

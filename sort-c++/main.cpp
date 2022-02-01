@@ -34,11 +34,11 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
-typedef struct _TrackingBox {
+using TrackingBox = struct _TrackingBox {
     int frame{0};
     int id{0};
     cv::Rect_<float> box;
-} TrackingBox;
+};
 
 // Computes IOU between two bounding boxes
 double GetIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt)
@@ -80,7 +80,7 @@ int main()
 
 void TestSORT(std::string seqName, bool display)
 {
-    std::cout << "Processing " << seqName << "..." << std::endl;
+    std::cout << "Processing " << seqName << "..." << display << std::endl;
 
     // 0. randomly generate colors, only for display
     cv::RNG rng(0xFFFFFFFF); // NOLINT
@@ -190,12 +190,12 @@ void TestSORT(std::string seqName, bool display)
         if (trackers.empty()) // the first frame met
         {
             // initialize kalman trackers using first detections.
-            for (unsigned int i = 0; i < detFrameData[fi].size(); i++) {
+            for (int i = 0; i < detFrameData[fi].size(); i++) {
                 KalmanTracker trk = KalmanTracker(detFrameData[fi][i].box);
                 trackers.emplace_back(trk);
             }
             // output the first frame detections
-            for (unsigned int id = 0; id < detFrameData[fi].size(); id++) {
+            for (int id = 0; id < detFrameData[fi].size(); id++) {
                 TrackingBox tb = detFrameData[fi][id];
                 resultsFile << tb.frame << "," << id + 1 << "," << tb.box.x << "," << tb.box.y << "," << tb.box.width
                             << "," << tb.box.height << ",1,-1,-1,-1" << std::endl;
@@ -239,7 +239,7 @@ void TestSORT(std::string seqName, bool display)
         // the resulting assignment is [track(prediction) : detection], with len=preNum
         HungarianAlgorithm HungAlgo;
         assignment.clear();
-        HungAlgo.Solve(iouMatrix, assignment);
+        HungarianAlgorithm::Solve(iouMatrix, assignment);
 
         // find matches, unmatched_detections and unmatched_predictions
         unmatchedTrajectories.clear();
@@ -249,11 +249,11 @@ void TestSORT(std::string seqName, bool display)
 
         if (detNum > trkNum) //	there are unmatched detections
         {
-            for (unsigned int n = 0; n < detNum; n++) {
+            for (int n = 0; n < detNum; n++) {
                 allItems.insert(n);
             }
 
-            for (unsigned int i = 0; i < trkNum; ++i) {
+            for (int i = 0; i < trkNum; ++i) {
                 matchedItems.insert(assignment[i]);
             }
 
@@ -261,7 +261,7 @@ void TestSORT(std::string seqName, bool display)
                            std::insert_iterator<std::set<int>>(unmatchedDetections, unmatchedDetections.begin()));
         } else if (detNum < trkNum) // there are unmatched trajectory/predictions
         {
-            for (unsigned int i = 0; i < trkNum; ++i) {
+            for (int i = 0; i < trkNum; ++i) {
                 if (assignment[i] == -1) { // unassigned label will be set as -1 in the assignment algorithm
                     unmatchedTrajectories.insert(i);
                 }
@@ -272,7 +272,7 @@ void TestSORT(std::string seqName, bool display)
 
         // filter out matched with low IOU
         matchedPairs.clear();
-        for (unsigned int i = 0; i < trkNum; ++i) {
+        for (int i = 0; i < trkNum; ++i) {
             if (assignment[i] == -1) { // pass over invalid values
                 continue;
             }
@@ -280,7 +280,7 @@ void TestSORT(std::string seqName, bool display)
                 unmatchedTrajectories.insert(i);
                 unmatchedDetections.insert(assignment[i]);
             } else {
-                matchedPairs.push_back(cv::Point(i, assignment[i]));
+                matchedPairs.emplace_back(cv::Point(i, assignment[i]));
             }
         }
 

@@ -116,8 +116,8 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
 
     // associate detections to tracked object (both represented as bounding boxes)
     // dets : detFrameData[fi]
-    int trkNum = predictedBoxes.size();
-    int detNum = tracking_box_vec.size();
+    int trkNum = static_cast<int>(predictedBoxes.size());
+    int detNum = static_cast<int>(tracking_box_vec.size());
 
     std::vector<std::vector<double>> iouMatrix;
     iouMatrix.resize(trkNum, std::vector<double>(detNum, 0));
@@ -139,7 +139,7 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
     HungarianAlgorithm HungAlgo;
     std::vector<int> assignment;
     if (!iouMatrix.empty()) {
-        HungAlgo.Solve(iouMatrix, assignment);
+        HungarianAlgorithm::Solve(iouMatrix, assignment);
     }
 
     std::set<int> unmatchedDetections;
@@ -152,11 +152,11 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         if (_show_msg) {
             std::cout << "New Track Object ID ::" << trkNum + 1 << std::endl;
         }
-        for (unsigned int n = 0; n < detNum; n++) {
+        for (int n = 0; n < detNum; n++) {
             allItems.insert(n);
         }
 
-        for (unsigned int i = 0; i < trkNum; ++i) {
+        for (int i = 0; i < trkNum; ++i) {
             matchedItems.insert(assignment[i]);
         }
 
@@ -167,7 +167,7 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         if (_show_msg) {
             std::cout << "HERE 2" << std::endl;
         }
-        for (unsigned int i = 0; i < trkNum; ++i) {
+        for (int i = 0; i < trkNum; ++i) {
             if (assignment[i] == -1) { // unassigned label will be set as -1 in the assignment algorithm
                 unmatchedTrajectories.insert(i);
             }
@@ -178,7 +178,7 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
 
     // filter out matched with low IOU
     matchedPairs.clear();
-    for (unsigned int i = 0; i < trkNum; ++i) {
+    for (int i = 0; i < trkNum; ++i) {
         if (assignment[i] == -1) { // pass over invalid values
             continue;
         }

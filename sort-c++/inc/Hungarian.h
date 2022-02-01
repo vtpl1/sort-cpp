@@ -17,7 +17,7 @@ class HungarianAlgorithm
   public:
     HungarianAlgorithm() = default;
     ~HungarianAlgorithm() = default;
-    double Solve(std::vector<std::vector<double>>& DistMatrix, std::vector<int>& Assignment);
+    static double Solve(std::vector<std::vector<double>>& DistMatrix, std::vector<int>& Assignment);
 
   private:
     static void assignmentoptimal(int* assignment, double* cost, double* distMatrix, int nOfRows, int nOfColumns);
