@@ -30,15 +30,16 @@
 
 #include "Hungarian.h"
 #include "KalmanTracker.h"
+#include "SortTracker.h"
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
-using TrackingBox = struct _TrackingBox {
-    int frame{0};
-    int id{0};
-    cv::Rect_<float> box;
-};
+// using TrackingBox = struct _TrackingBox {
+//     int frame{0};
+//     int id{0};
+//     cv::Rect_<float> box;
+// };
 
 // Computes IOU between two bounding boxes
 double GetIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt)
@@ -57,34 +58,14 @@ double GetIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt)
 constexpr int CNUM = 20;
 int total_frames = 0;
 double total_time = 0.0;
-
-void TestSORT(std::string seqName, bool display);
-
-int main()
-{
-    std::vector<std::string> sequences = {"PETS09-S2L1",  "TUD-Campus",    "TUD-Stadtmitte", "ETH-Bahnhof",
-                                          "ETH-Sunnyday", "ETH-Pedcross2", "KITTI-13",       "KITTI-17",
-                                          "ADL-Rundle-6", "ADL-Rundle-8",  "Venice-2"};
-    for (auto seq : sequences) {
-        TestSORT(seq, false);
-    }
-    // TestSORT("PETS09-S2L1", true);
-
-    // Note: time counted here is of tracking procedure, while the running speed bottleneck is opening and parsing
-    // detectionFile.
-    std::cout << "Total Tracking took: " << total_time << " for " << total_frames << " frames or "
-              << (static_cast<double>(total_frames) / static_cast<double>(total_time)) << " FPS" << std::endl;
-
-    return 0;
-}
-
-void TestSORT(std::string seqName, bool display)
+constexpr auto INITIAL_SEED = 0xFFFFFFFF;
+void TestSORT(const std::string& seqName, bool display)
 {
     std::cout << "Processing " << seqName << "..." << display << std::endl;
 
     // 0. randomly generate colors, only for display
-    cv::RNG rng(0xFFFFFFFF); // NOLINT
-    cv::Scalar_<int> randColor[CNUM];
+    cv::RNG rng(INITIAL_SEED);
+    std::array<cv::Scalar_<int>, CNUM> randColor; // cv::Scalar_<int> randColor[CNUM];
     for (int i = 0; i < CNUM; i++) {
         rng.fill(randColor[i], cv::RNG::UNIFORM, 0, 256); // NOLINT
     }
@@ -101,7 +82,7 @@ void TestSORT(std::string seqName, bool display)
 
     std::string detLine;
     std::istringstream ss;
-    std::vector<TrackingBox> detData;
+    std::vector<vtpl::TrackingBox> detData;
     char ch = 0;
     float tpx = 0.0;
     float tpy = 0.0;
@@ -109,14 +90,14 @@ void TestSORT(std::string seqName, bool display)
     float tph = 0.0;
 
     while (getline(detectionFile, detLine)) {
-        TrackingBox tb;
+        vtpl::TrackingBox tb;
 
         ss.str(detLine);
         ss >> tb.frame >> ch >> tb.id >> ch;
         ss >> tpx >> ch >> tpy >> ch >> tpw >> ch >> tph;
         ss.str("");
 
-        tb.box = cv::Rect_<float>(cv::Point_<float>(tpx, tpy), cv::Point_<float>(tpx + tpw, tpy + tph));
+        tb.rect = cv::Rect_<float>(cv::Point_<float>(tpx, tpy), cv::Point_<float>(tpx + tpw, tpy + tph));
         detData.push_back(tb);
     }
     detectionFile.close();
@@ -130,8 +111,8 @@ void TestSORT(std::string seqName, bool display)
         }
     }
 
-    std::vector<std::vector<TrackingBox>> detFrameData;
-    std::vector<TrackingBox> tempVec;
+    std::vector<std::vector<vtpl::TrackingBox>> detFrameData;
+    std::vector<vtpl::TrackingBox> tempVec;
     for (int fi = 0; fi < maxFrame; fi++) {
         for (auto tb : detData) {
             if (tb.frame == fi + 1) { // frame num starts from 1
@@ -159,7 +140,7 @@ void TestSORT(std::string seqName, bool display)
     std::set<int> allItems;
     std::set<int> matchedItems;
     std::vector<cv::Point> matchedPairs;
-    std::vector<TrackingBox> frameTrackingResult;
+    std::vector<vtpl::TrackingBox> frameTrackingResult;
     unsigned int trkNum = 0;
     unsigned int detNum = 0;
 
@@ -190,15 +171,16 @@ void TestSORT(std::string seqName, bool display)
         if (trackers.empty()) // the first frame met
         {
             // initialize kalman trackers using first detections.
-            for (int i = 0; i < detFrameData[fi].size(); i++) {
-                KalmanTracker trk = KalmanTracker(detFrameData[fi][i].box);
+            for (const auto & detFrameData_ : detFrameData[fi]) {
+            //for (int i = 0; i < detFrameData[fi].size(); i++) {
+                KalmanTracker trk = KalmanTracker(detFrameData_.rect);
                 trackers.emplace_back(trk);
             }
             // output the first frame detections
             for (int id = 0; id < detFrameData[fi].size(); id++) {
-                TrackingBox tb = detFrameData[fi][id];
-                resultsFile << tb.frame << "," << id + 1 << "," << tb.box.x << "," << tb.box.y << "," << tb.box.width
-                            << "," << tb.box.height << ",1,-1,-1,-1" << std::endl;
+                vtpl::TrackingBox tb = detFrameData[fi][id];
+                resultsFile << tb.frame << "," << id + 1 << "," << tb.rect.x << "," << tb.rect.y << "," << tb.rect.width
+                            << "," << tb.rect.height << ",1,-1,-1,-1" << std::endl;
             }
             continue;
         }
@@ -231,7 +213,7 @@ void TestSORT(std::string seqName, bool display)
         {
             for (unsigned int j = 0; j < detNum; j++) {
                 // use 1-iou because the hungarian algorithm computes a minimum-cost assignment.
-                iouMatrix[i][j] = 1 - GetIOU(predictedBoxes[i], detFrameData[fi][j].box);
+                iouMatrix[i][j] = 1 - GetIOU(predictedBoxes[i], detFrameData[fi][j].rect);
             }
         }
 
@@ -294,12 +276,12 @@ void TestSORT(std::string seqName, bool display)
         for (auto& matchedPair : matchedPairs) {
             trkIdx = matchedPair.x;
             detIdx = matchedPair.y;
-            trackers[trkIdx].update(detFrameData[fi][detIdx].box);
+            trackers[trkIdx].update(detFrameData[fi][detIdx].rect);
         }
 
         // create and initialise new trackers for unmatched detections
         for (auto umd : unmatchedDetections) {
-            KalmanTracker tracker = KalmanTracker(detFrameData[fi][umd].box);
+            KalmanTracker tracker = KalmanTracker(detFrameData[fi][umd].rect);
             trackers.emplace_back(tracker);
         }
 
@@ -307,8 +289,8 @@ void TestSORT(std::string seqName, bool display)
         frameTrackingResult.clear();
         for (auto it = trackers.begin(); it != trackers.end();) {
             if (((*it).m_time_since_update < 1) && ((*it).m_hit_streak >= min_hits || frame_count <= min_hits)) {
-                TrackingBox res;
-                res.box = (*it).get_state();
+                vtpl::TrackingBox res;
+                res.rect = (*it).get_state();
                 res.id = (*it).m_id + 1;
                 res.frame = frame_count;
                 frameTrackingResult.push_back(res);
@@ -327,10 +309,28 @@ void TestSORT(std::string seqName, bool display)
         total_time += cycle_time / cv::getTickFrequency();
 
         for (auto tb : frameTrackingResult) {
-            resultsFile << tb.frame << "," << tb.id << "," << tb.box.x << "," << tb.box.y << "," << tb.box.width << ","
-                        << tb.box.height << ",1,-1,-1,-1" << std::endl;
+            resultsFile << tb.frame << "," << tb.id << "," << tb.rect.x << "," << tb.rect.y << "," << tb.rect.width
+                        << "," << tb.rect.height << ",1,-1,-1,-1" << std::endl;
         }
     }
 
     resultsFile.close();
+}
+
+int main()
+{
+    std::vector<std::string> sequences = {"PETS09-S2L1",  "TUD-Campus",    "TUD-Stadtmitte", "ETH-Bahnhof",
+                                          "ETH-Sunnyday", "ETH-Pedcross2", "KITTI-13",       "KITTI-17",
+                                          "ADL-Rundle-6", "ADL-Rundle-8",  "Venice-2"};
+    for (const auto& seq : sequences) {
+        TestSORT(seq, false);
+    }
+    // TestSORT("PETS09-S2L1", true);
+
+    // Note: time counted here is of tracking procedure, while the running speed bottleneck is opening and parsing
+    // detectionFile.
+    std::cout << "Total Tracking took: " << total_time << " for " << total_frames << " frames or "
+              << (static_cast<double>(total_frames) / static_cast<double>(total_time)) << " FPS" << std::endl;
+
+    return 0;
 }

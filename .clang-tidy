@@ -1,5 +1,5 @@
 ---
-Checks:          '*,-llvmlibc-*,-fuchsia-default-arguments-calls,-altera-unroll-loops,-altera-id-dependent-*,-modernize-use-trailing-return-type,-bugprone-easily-swappable-parameters,-misc-no-recursion,-cppcoreguidelines-pro-bounds-pointer-arithmetic'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,*,-llvmlibc-*,-fuchsia-default-arguments-calls,-altera-unroll-loops,-altera-id-dependent-*,-modernize-use-trailing-return-type,-bugprone-easily-swappable-parameters,-misc-no-recursion,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-avoid-non-const-global-variables'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
@@ -576,7 +576,7 @@ CheckOptions:
   - key:             modernize-use-noexcept.UseNoexceptFalse
     value:           'true'
   - key:             readability-function-cognitive-complexity.Threshold
-    value:           '80'
+    value:           '100'
   - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
     value:           'true'
   - key:             bugprone-argument-comment.IgnoreSingleArgument

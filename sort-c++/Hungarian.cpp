@@ -38,8 +38,8 @@ double HungarianAlgorithm::Solve(std::vector<std::vector<double>>& DistMatrix, s
     }
 
     // call solving function
-    assignmentoptimal(assignment.empty() ? nullptr : &assignment[0], &cost,
-                      distMatrixIn.empty() ? nullptr : &distMatrixIn[0], nRows, nCols);
+    assignmentoptimal(assignment.empty() ? nullptr : assignment.data(), &cost,
+                      distMatrixIn.empty() ? nullptr : distMatrixIn.data(), nRows, nCols);
 
     Assignment.clear();
     for (unsigned int r = 0; r < nRows; r++) {
@@ -77,6 +77,9 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
     /* initialization */
     *cost = 0;
     for (row = 0; row < nOfRows; row++) {
+        if (assignment == nullptr) { // TODO(vtpl1): introduced
+            break;
+        }
         assignment[row] = -1;
     }
 
@@ -88,6 +91,9 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
     distMatrixEnd = distMatrix.empty() ? nullptr : &distMatrix[0] + nOfElements;
 
     for (row = 0; row < nOfElements; row++) {
+        if ((distMatrixIn == nullptr) || distMatrix.empty()) { // TODO(vtpl1): introduced
+            break;
+        }
         value = distMatrixIn[row];
         if (value < 0) {
             std::cerr << "All matrix elements have to be non-negative." << std::endl;
@@ -115,6 +121,10 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
         for (row = 0; row < nOfRows; row++) {
             /* find the smallest element in the row */
             distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + row;
+            if ((distMatrixTemp == nullptr) || (distMatrixEnd == nullptr)) { // TODO(vtpl1): introduced
+                break;
+            }
+
             minValue = *distMatrixTemp;
             distMatrixTemp += nOfRows;
             while (distMatrixTemp < distMatrixEnd) {
@@ -127,6 +137,9 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
 
             /* subtract the smallest element from each element of the row */
             distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + row;
+            if ((distMatrixTemp == nullptr) || (distMatrixEnd == nullptr)) { // TODO(vtpl1): introduced
+                break;
+            }
             while (distMatrixTemp < distMatrixEnd) {
                 *distMatrixTemp -= minValue;
                 distMatrixTemp += nOfRows;
@@ -151,7 +164,10 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
 
         for (col = 0; col < nOfColumns; col++) {
             /* find the smallest element in the column */
-            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + nOfRows * col;
+            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + static_cast<ptrdiff_t>(nOfRows * col);
+            if (distMatrixTemp == nullptr) { // TODO(vtpl1): introduced
+                break;
+            }
             columnEnd = distMatrixTemp + nOfRows;
 
             minValue = *distMatrixTemp++;
@@ -163,7 +179,10 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
             }
 
             /* subtract the smallest element from each element of the column */
-            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + nOfRows * col;
+            distMatrixTemp = distMatrix.empty() ? nullptr : &distMatrix[0] + static_cast<ptrdiff_t>(nOfRows * col);
+            if (distMatrixTemp == nullptr) { // TODO(vtpl1): introduced
+                break;
+            }
             while (distMatrixTemp < columnEnd) {
                 *distMatrixTemp++ -= minValue;
             }
@@ -188,10 +207,10 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
     }
 
     /* move to step 2b */
-    step2b(assignment, distMatrix.empty() ? nullptr : &distMatrix[0], starMatrix.empty() ? nullptr : &starMatrix[0],
-           newStarMatrix.empty() ? nullptr : &newStarMatrix[0], primeMatrix.empty() ? nullptr : &primeMatrix[0],
-           coveredColumns.empty() ? nullptr : &coveredColumns[0], coveredRows.empty() ? nullptr : &coveredRows[0],
-           nOfRows, nOfColumns, minDim);
+    step2b(assignment, (distMatrix.empty() ? nullptr : distMatrix.data()),
+           starMatrix.empty() ? nullptr : &starMatrix[0], newStarMatrix.empty() ? nullptr : &newStarMatrix[0],
+           primeMatrix.empty() ? nullptr : &primeMatrix[0], coveredColumns.empty() ? nullptr : &coveredColumns[0],
+           coveredRows.empty() ? nullptr : &coveredRows[0], nOfRows, nOfColumns, minDim);
 
     /* compute cost and remove invalid assignments */
     computeassignmentcost(assignment, cost, distMatrixIn, nOfRows);
@@ -252,7 +271,7 @@ void HungarianAlgorithm::step2a(int* assignment, double* distMatrix, unsigned ch
 
     /* cover every column containing a starred zero */
     for (col = 0; col < nOfColumns; col++) {
-        starMatrixTemp = starMatrix + nOfRows * col;
+        starMatrixTemp = starMatrix + static_cast<ptrdiff_t>(nOfRows * col);
         columnEnd = starMatrixTemp + nOfRows;
         while (starMatrixTemp < columnEnd) {
             if (*starMatrixTemp++ == 1) {
@@ -278,6 +297,9 @@ void HungarianAlgorithm::step2b(int* assignment, double* distMatrix, unsigned ch
     /* count covered columns */
     nOfCoveredColumns = 0;
     for (col = 0; col < nOfColumns; col++) {
+        if (coveredColumns == nullptr) { // TODO(vtpl1): introduced
+            break;
+        }
         if (coveredColumns[col] == 1) {
             nOfCoveredColumns++;
         }
@@ -326,12 +348,11 @@ void HungarianAlgorithm::step3(int* assignment, double* distMatrix, unsigned cha
                             step4(assignment, distMatrix, starMatrix, newStarMatrix, primeMatrix, coveredColumns,
                                   coveredRows, nOfRows, nOfColumns, minDim, row, col);
                             return;
-                        } else {
-                            coveredRows[row] = 1;
-                            coveredColumns[starCol] = 0;
-                            zerosFound = 1;
-                            break;
                         }
+                        coveredRows[row] = 1;
+                        coveredColumns[starCol] = 0;
+                        zerosFound = 1;
+                        break;
                     }
                 }
             }

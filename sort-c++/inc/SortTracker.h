@@ -6,14 +6,23 @@
 #include <vector>
 namespace vtpl
 {
-typedef struct _TrackingBox {
+// typedef struct _TrackingBox {
+//     _TrackingBox() {}
+//     _TrackingBox(const cv::Rect_<float>& rect): rect(rect) {}
+//     int frame{0};
+//     int id{0};
+//     cv::Rect_<float> rect;
+//     // int miss_count{0};
+// } TrackingBox;
+
+using TrackingBox = struct _TrackingBox {
     _TrackingBox() {}
     _TrackingBox(const cv::Rect_<float>& rect): rect(rect) {}
     int frame{0};
     int id{0};
     cv::Rect_<float> rect;
     // int miss_count{0};
-} TrackingBox;
+};
 
 class SortTracker
 {
