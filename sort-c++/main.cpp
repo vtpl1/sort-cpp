@@ -106,7 +106,8 @@ void TestSORT(const std::string& seqName, bool display)
 
     // 2. group detData by frame
     int maxFrame = 0;
-    for (auto tb : detData) // find max frame number
+
+    for (const auto& tb : detData) // find max frame number
     {
         if (maxFrame < tb.frame) {
             maxFrame = tb.frame;
@@ -116,7 +117,7 @@ void TestSORT(const std::string& seqName, bool display)
     std::vector<std::vector<vtpl::TrackingBox>> detFrameData;
     std::vector<vtpl::TrackingBox> tempVec;
     for (int fi = 0; fi < maxFrame; fi++) {
-        for (auto tb : detData) {
+        for (const auto& tb : detData) {
             if (tb.frame == fi + 1) { // frame num starts from 1
                 tempVec.push_back(tb);
             }
@@ -309,7 +310,7 @@ void TestSORT(const std::string& seqName, bool display)
         cycle_time = static_cast<double>(cv::getTickCount() - start_time);
         total_time += cycle_time / cv::getTickFrequency();
 
-        for (auto tb : frameTrackingResult) {
+        for (const auto& tb : frameTrackingResult) {
             resultsFile << tb.frame << "," << tb.id << "," << tb.rect.x << "," << tb.rect.y << "," << tb.rect.width
                         << "," << tb.rect.height << ",1,-1,-1,-1" << std::endl;
         }

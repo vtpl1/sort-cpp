@@ -23,7 +23,7 @@ double HungarianAlgorithm::Solve(std::vector<std::vector<double>>& DistMatrix, s
 
     // double* distMatrixIn = new double[nRows * nCols];
     // int* assignment = new int[nRows];
-    std::vector<double> distMatrixIn(static_cast<size_t>(nRows * nCols), 0.0);
+    std::vector<double> distMatrixIn((static_cast<size_t>(nRows) * nCols), 0.0);
     std::vector<int> assignment(nRows, 0);
     double cost = 0.0;
 
@@ -33,7 +33,7 @@ double HungarianAlgorithm::Solve(std::vector<std::vector<double>>& DistMatrix, s
     // (i.e. the matrix [1 2; 3 4] will be stored as a vector [1 3 2 4], NOT [1 2 3 4]).
     for (int i = 0; i < nRows; i++) {
         for (int j = 0; j < nCols; j++) {
-            distMatrixIn[i + nRows * j] = DistMatrix[i][j];
+            distMatrixIn[i + static_cast<int>(nRows * j)] = DistMatrix[i][j];
         }
     }
 
@@ -151,7 +151,7 @@ void HungarianAlgorithm::assignmentoptimal(int* assignment, double* cost, double
             for (col = 0; col < nOfColumns; col++) {
                 if (fabs(distMatrix[row + nOfRows * col]) < DBL_EPSILON) {
                     if (coveredColumns[col] == 0) {
-                        starMatrix[row + nOfRows * col] = 1;
+                        starMatrix[row + static_cast<int>(nOfRows * col)] = 1;
                         coveredColumns[col] = 1;
                         break;
                     }
