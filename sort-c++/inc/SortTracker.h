@@ -16,7 +16,7 @@ namespace vtpl
 // } TrackingBox;
 
 using TrackingBox = struct _TrackingBox {
-    _TrackingBox() {}
+    _TrackingBox() = delete;
     _TrackingBox(const cv::Rect_<float>& rect): rect(rect) {}
     int frame{0};
     int id{0};

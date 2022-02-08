@@ -222,8 +222,8 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
             }
             it = _trackers.erase(it);
         } else if (((*it).m_time_since_update < 1) && ((*it).m_hit_streak >= _min_hits || _frame_count <= _min_hits)) {
-            TrackingBox res;
-            res.rect = (*it).get_state();
+            TrackingBox res((*it).get_state());
+            // res.rect = (*it).get_state();
             res.id = (*it).m_id;
             res.frame = _frame_count;
             // res.miss_count = (*it).m_time_since_update;

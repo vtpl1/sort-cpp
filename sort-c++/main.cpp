@@ -83,6 +83,8 @@ void TestSORT(const std::string& seqName, bool display)
     std::string detLine;
     std::istringstream ss;
     std::vector<vtpl::TrackingBox> detData;
+    int frame = 0;
+    int id = 0;
     char ch = 0;
     float tpx = 0.0;
     float tpy = 0.0;
@@ -90,14 +92,14 @@ void TestSORT(const std::string& seqName, bool display)
     float tph = 0.0;
 
     while (getline(detectionFile, detLine)) {
-        vtpl::TrackingBox tb;
-
         ss.str(detLine);
-        ss >> tb.frame >> ch >> tb.id >> ch;
+        ss >> frame >> ch >> id >> ch;
         ss >> tpx >> ch >> tpy >> ch >> tpw >> ch >> tph;
         ss.str("");
 
-        tb.rect = cv::Rect_<float>(cv::Point_<float>(tpx, tpy), cv::Point_<float>(tpx + tpw, tpy + tph));
+        vtpl::TrackingBox tb(cv::Rect_<float>(cv::Point_<float>(tpx, tpy), cv::Point_<float>(tpx + tpw, tpy + tph)));
+        tb.frame = frame;
+        tb.id = id;
         detData.push_back(tb);
     }
     detectionFile.close();
@@ -171,8 +173,8 @@ void TestSORT(const std::string& seqName, bool display)
         if (trackers.empty()) // the first frame met
         {
             // initialize kalman trackers using first detections.
-            for (const auto & detFrameData_ : detFrameData[fi]) {
-            //for (int i = 0; i < detFrameData[fi].size(); i++) {
+            for (const auto& detFrameData_ : detFrameData[fi]) {
+                // for (int i = 0; i < detFrameData[fi].size(); i++) {
                 KalmanTracker trk = KalmanTracker(detFrameData_.rect);
                 trackers.emplace_back(trk);
             }
@@ -289,8 +291,7 @@ void TestSORT(const std::string& seqName, bool display)
         frameTrackingResult.clear();
         for (auto it = trackers.begin(); it != trackers.end();) {
             if (((*it).m_time_since_update < 1) && ((*it).m_hit_streak >= min_hits || frame_count <= min_hits)) {
-                vtpl::TrackingBox res;
-                res.rect = (*it).get_state();
+                vtpl::TrackingBox res((*it).get_state());
                 res.id = (*it).m_id + 1;
                 res.frame = frame_count;
                 frameTrackingResult.push_back(res);
