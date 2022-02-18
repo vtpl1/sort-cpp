@@ -2,9 +2,9 @@
 // KalmanTracker.h: KalmanTracker Class Declaration
 
 #ifndef KALMAN_H
-#define KALMAN_H 2
+#define KALMAN_H
 
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 #define StateType cv::Rect_<float>
 

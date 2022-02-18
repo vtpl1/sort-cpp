@@ -1,3 +1,7 @@
+#pragma once
+#ifndef Hungarian_h
+#define Hungarian_h
+
 ///////////////////////////////////////////////////////////////////////////////
 // Hungarian.h: Header file for Class HungarianAlgorithm.
 //
@@ -39,3 +43,5 @@ class HungarianAlgorithm
                unsigned char* primeMatrix, unsigned char* coveredColumns, unsigned char* coveredRows, int nOfRows,
                int nOfColumns, int minDim);
 };
+
+#endif	// Hungarian_h

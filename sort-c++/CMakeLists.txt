@@ -1,18 +1,25 @@
 cmake_minimum_required(VERSION 3.17)
 
-find_package( OpenCV REQUIRED )
+find_package(OpenCV REQUIRED)
 
 add_library(sort_cpp STATIC
-    Hungarian.cpp
-    KalmanTracker.cpp
-    SortTracker.cpp
+  Hungarian.cpp
+  KalmanTracker.cpp
+  SortTracker.cpp
+)
+
+target_precompile_headers(sort_cpp
+  PUBLIC inc/Hungarian.h
+  PUBLIC inc/KalmanTracker.h
+  PUBLIC inc/SortTracker.h
 )
 
 target_include_directories(sort_cpp
   PUBLIC inc
 )
+
 target_link_libraries(sort_cpp
-    PUBLIC ${OpenCV_LIBS}
+  PUBLIC opencv_video
 )
 
 set_property(TARGET sort_cpp PROPERTY
@@ -23,7 +30,7 @@ add_executable(sort_cpp_exe
 )
 
 target_link_libraries(sort_cpp_exe
-    PUBLIC sort_cpp
+  PRIVATE sort_cpp
 )
 
 set_property(TARGET sort_cpp_exe PROPERTY

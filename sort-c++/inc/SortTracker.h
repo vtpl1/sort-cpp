@@ -1,9 +1,11 @@
 #pragma once
 #ifndef SortTracker_h
 #define SortTracker_h
-#include "KalmanTracker.h"
 #include <opencv2/opencv.hpp>
 #include <vector>
+
+#include "KalmanTracker.h"
+
 namespace vtpl
 {
 // typedef struct _TrackingBox {

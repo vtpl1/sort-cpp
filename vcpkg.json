@@ -3,10 +3,8 @@
     "version-string": "0.1",
     "dependencies": [
         {
-            "name": "opencv",
-            "features": [
-                "gtk"
-            ]
+            "name": "opencv4",
+            "default-features": false
         }
     ]
 }
