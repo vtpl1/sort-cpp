@@ -6,7 +6,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#define StateType cv::Rect_<float>
+using StateType = cv::Rect2f;
 
 // This class represents the internel state of individual tracked objects observed as bounding box.
 class KalmanTracker
