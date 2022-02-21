@@ -89,7 +89,7 @@ StateType KalmanTracker::get_rect_xysr(float cx, float cy, float s, float r)
         y = 0;
     }
 
-    return StateType(x, y, w, h);
+    return StateType{x, y, w, h};
 }
 
 /*
