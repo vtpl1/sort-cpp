@@ -64,7 +64,7 @@ SortTracker::SortTracker(int max_age, int min_hits, double iou_threshold, bool s
 SortTracker::~SortTracker() { _trackers.clear(); }
 
 std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::TrackingBox>& tracking_box_vec,
-                                                      float rc_ext, int height, int width, bool iou_mod)
+                                                      int height, int width)
 {
     // _show_msg = true;
     if (_show_msg) {
@@ -126,8 +126,8 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
     {
         for (unsigned int j = 0; j < detNum; j++) {
             // use 1-iou because the hungarian algorithm computes a minimum-cost assignment.
-            if (iou_mod) {
-                iouMatrix[i][j] = 1 - getModIOU(predictedBoxes[i], tracking_box_vec.at(j).rect, rc_ext, height, width);
+            if (_iou_mod) {
+                iouMatrix[i][j] = 1 - getModIOU(predictedBoxes[i], tracking_box_vec.at(j).rect, _rc_ext, height, width);
             } else {
                 iouMatrix[i][j] = 1 - getIOU(predictedBoxes[i], tracking_box_vec.at(j).rect);
             }
@@ -236,4 +236,11 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
 
     return frameTrackingResult;
 }
+
+void SortTracker::setMaxAge(const int& max_age) { _max_age = max_age; }
+void SortTracker::setMinHits(const int& min_hits) { _min_hits = min_hits; }
+void SortTracker::setIOUThreshold(const double& iou_threshold) { _iou_threshold = iou_threshold; }
+void SortTracker::setRCExt(const float& rc_ext) { _rc_ext = rc_ext; }
+void SortTracker::setIOUMod(const bool& iou_mod) { _iou_mod = iou_mod; }
+void SortTracker::setShowMsg(const bool& show_msg) { _show_msg = show_msg; }
 } // namespace vtpl

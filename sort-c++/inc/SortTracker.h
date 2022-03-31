@@ -19,10 +19,11 @@ namespace vtpl
 
 using TrackingBox = struct _TrackingBox {
     _TrackingBox() = delete;
-    _TrackingBox(const cv::Rect_<float>& rect): rect(rect) {}
+    //_TrackingBox(const cv::Rect& rect) : rect(rect.x, rect.y, rect.width, rect.height) {}
+    _TrackingBox(const cv::Rect2f& rect) : rect(rect) {}
     int frame{0};
     int id{0};
-    cv::Rect_<float> rect;
+    cv::Rect2f rect;
     // int miss_count{0};
 };
 
@@ -32,6 +33,8 @@ class SortTracker
     int _max_age;
     int _min_hits;
     double _iou_threshold;
+    float _rc_ext{1.0};
+    bool _iou_mod{true};
     bool _show_msg; // show message
     int _frame_count;
 
@@ -39,9 +42,15 @@ class SortTracker
 
   public:
     SortTracker(int max_age, int min_hits, double iou_threshold, bool show_msg);
-    std::vector<vtpl::TrackingBox> getResult(const std::vector<vtpl::TrackingBox>& tracking_box_vec, float rc_ext,
-                                             int height, int width, bool iou_mod);
     ~SortTracker();
+    std::vector<vtpl::TrackingBox> getResult(const std::vector<vtpl::TrackingBox>& tracking_box_vec, int height,
+                                             int width);
+    void setMaxAge(const int& max_age);
+    void setMinHits(const int& min_hits);
+    void setIOUThreshold(const double& iou_threshold);
+    void setRCExt(const float& rc_ext);
+    void setIOUMod(const bool& iou_mod);
+    void setShowMsg(const bool& show_msg);
 };
 
 } // namespace vtpl
