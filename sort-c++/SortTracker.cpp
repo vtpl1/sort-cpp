@@ -243,10 +243,10 @@ void SortTracker::setIOUThreshold(const double& iou_threshold) { _iou_threshold 
 void SortTracker::setRCExt(const float& rc_ext) { _rc_ext = rc_ext; }
 void SortTracker::setIOUMod(const bool& iou_mod) { _iou_mod = iou_mod; }
 void SortTracker::setShowMsg(const bool& show_msg) { _show_msg = show_msg; }
-int SortTracker::getMaxAge() { return _max_age; }
-int SortTracker::getMinHits() { return _min_hits; }
-double SortTracker::getIOUThreshold() { return _iou_threshold; }
-float SortTracker::getRCExt() { return _rc_ext; }
-bool SortTracker::getIOUMod() { return _iou_mod; }
-bool SortTracker::getShowMsg() { return _show_msg; }
+int SortTracker::getMaxAge() const { return _max_age; }
+int SortTracker::getMinHits() const { return _min_hits; }
+double SortTracker::getIOUThreshold() const { return _iou_threshold; }
+float SortTracker::getRCExt() const { return _rc_ext; }
+bool SortTracker::getIOUMod() const { return _iou_mod; }
+bool SortTracker::getShowMsg() const { return _show_msg; }
 } // namespace vtpl

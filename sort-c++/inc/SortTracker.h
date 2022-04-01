@@ -51,12 +51,12 @@ class SortTracker
     void setRCExt(const float& rc_ext);
     void setIOUMod(const bool& iou_mod);
     void setShowMsg(const bool& show_msg);
-    int getMaxAge();
-    int getMinHits();
-    double getIOUThreshold();
-    float getRCExt();
-    bool getIOUMod();
-    bool getShowMsg();
+    int getMaxAge() const;
+    int getMinHits() const;
+    double getIOUThreshold() const;
+    float getRCExt() const;
+    bool getIOUMod() const;
+    bool getShowMsg() const;
 };
 
 } // namespace vtpl
