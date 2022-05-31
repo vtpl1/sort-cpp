@@ -19,6 +19,7 @@ double getIOU(const cv::Rect_<float>& bb_test, const cv::Rect_<float>& bb_gt)
 // Computes modified IOU between two bounding boxes
 double getModIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt, float rc_ext, int height, int width)
 {
+
     constexpr float rc_ext_divisor = 2.0;
     int col_ext_bb_gt = int(bb_gt.width * (rc_ext / rc_ext_divisor));
     int row_ext_bb_gt = int(bb_gt.height * (2 * rc_ext));
@@ -101,17 +102,33 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
     // get predicted locations from existing trackers.
     std::vector<cv::Rect_<float>> predictedBoxes;
 
+    // for (auto it = _trackers.begin(); it != _trackers.end();) {
+    //     std::cout << "********* [" << (*it).m_id <<"][" << (*it).m_time_since_update << "][" << (*it).m_age << "]" <<
+    //     std::endl;
+
+    // }
+
     for (auto it = _trackers.begin(); it != _trackers.end();) {
         cv::Rect_<float> predicted_box = (*it).predict();
         if (predicted_box.x >= 0 && predicted_box.y >= 0) {
             predictedBoxes.emplace_back(predicted_box);
             it++;
         } else {
-            it = _trackers.erase(it);
-            if (_show_msg) {
-                std::cerr << "Box invalid at frame: " << _frame_count << std::endl;
-            }
+            predicted_box.x = 0;
+            predicted_box.y = 0;
+            predicted_box.width = 1;
+            predicted_box.height = 1;
+            predictedBoxes.emplace_back(predicted_box);
+            it++;
         }
+        // else {
+        //     // int p = 0;
+        //     if (_show_msg) {
+        //         std::cerr << "Trackid deleted: " <<  (*it).m_id << std::endl;
+        //         std::cerr << "Box invalid at frame: " << _frame_count << std::endl;
+        //     }
+        //     it = _trackers.erase(it);
+        // }
     }
 
     // associate detections to tracked object (both represented as bounding boxes)
