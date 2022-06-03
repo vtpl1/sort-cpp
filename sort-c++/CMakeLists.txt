@@ -22,8 +22,8 @@ target_link_libraries(sort_cpp
   PUBLIC opencv_video
 )
 
-set_property(TARGET sort_cpp PROPERTY
-  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# set_property(TARGET sort_cpp PROPERTY
+#   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 add_executable(sort_cpp_exe
   main.cpp
@@ -33,5 +33,5 @@ target_link_libraries(sort_cpp_exe
   PRIVATE sort_cpp
 )
 
-set_property(TARGET sort_cpp_exe PROPERTY
-  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# set_property(TARGET sort_cpp_exe PROPERTY
+#   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

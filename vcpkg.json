@@ -1,10 +1,18 @@
 {
     "name": "sorttracker",
     "version-string": "0.1",
+    "builtin-baseline": "14e7bb4ae24616ec54ff6b2f6ef4e8659434ea44",
     "dependencies": [
         {
             "name": "opencv4",
             "default-features": false
+        }
+    ],
+    "overrides": [
+        {
+            "name": "opencv4",
+            "version": "4.5.4",
+            "port-version": 4
         }
     ]
 }

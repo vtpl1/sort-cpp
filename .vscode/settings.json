@@ -4,10 +4,9 @@
     "files.trimFinalNewlines": true,
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.configureSettings": {
-        // "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "VCPKG_OVERLAY_TRIPLETS": "${workspaceFolder}",
+        "VCPKG_TARGET_TRIPLET": "x64-mixed",
         "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/../thirdparty/vcpkg/scripts/buildsystems/vcpkg.cmake",
-
     },
     "files.watcherExclude": {
         "**/.git/objects/**": true,
