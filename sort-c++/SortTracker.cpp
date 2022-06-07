@@ -17,44 +17,130 @@ double getIOU(const cv::Rect_<float>& bb_test, const cv::Rect_<float>& bb_gt)
 }
 
 // Computes modified IOU between two bounding boxes
-double getModIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt, float rc_ext, int height, int width)
+double getModIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt, float rc_ext, int height, int width, int method,
+                 float width_multiplier)
 {
+    // std::cout << "************************************************method: " << method << std::endl;
+    // std::cout << "************************************************width_multiplier: " << width_multiplier << std::endl;
+    if (method == 0) { // original method
+        constexpr float rc_ext_divisor = 2.0;
+        int col_ext_bb_gt = int(bb_gt.width * (rc_ext / rc_ext_divisor));
+        int row_ext_bb_gt = int(bb_gt.height * (2 * rc_ext));
 
-    constexpr float rc_ext_divisor = 2.0;
-    int col_ext_bb_gt = int(bb_gt.width * (rc_ext / rc_ext_divisor));
-    int row_ext_bb_gt = int(bb_gt.height * (2 * rc_ext));
+        cv::Rect_<float> temp_bb_gt;
+        temp_bb_gt.x = MAX(0, bb_gt.x - col_ext_bb_gt);
+        temp_bb_gt.y = MAX(0, bb_gt.y - row_ext_bb_gt);
+        int t_right = MIN(width - 1, bb_gt.x + bb_gt.width);
+        int t_bottom = MIN(height - 1, bb_gt.y + bb_gt.height);
+        t_right = MIN(width, t_right + col_ext_bb_gt);
+        t_bottom = MIN(height, t_bottom + row_ext_bb_gt);
+        temp_bb_gt.width = MAX(0, t_right - temp_bb_gt.x - 1);
+        temp_bb_gt.height = MAX(0, t_bottom - temp_bb_gt.y - 1);
 
-    cv::Rect_<float> temp_bb_gt;
-    temp_bb_gt.x = MAX(0, bb_gt.x - col_ext_bb_gt);
-    temp_bb_gt.y = MAX(0, bb_gt.y - row_ext_bb_gt);
-    int t_right = MIN(width - 1, bb_gt.x + bb_gt.width);
-    int t_bottom = MIN(height - 1, bb_gt.y + bb_gt.height);
-    t_right = MIN(width, t_right + col_ext_bb_gt);
-    t_bottom = MIN(height, t_bottom + row_ext_bb_gt);
-    temp_bb_gt.width = MAX(0, t_right - temp_bb_gt.x - 1);
-    temp_bb_gt.height = MAX(0, t_bottom - temp_bb_gt.y - 1);
+        int col_ext_bb_test = int(bb_test.width * (rc_ext / rc_ext_divisor));
+        int row_ext_bb_test = int(bb_test.height * (2 * rc_ext));
 
-    int col_ext_bb_test = int(bb_test.width * (rc_ext / rc_ext_divisor));
-    int row_ext_bb_test = int(bb_test.height * (2 * rc_ext));
+        cv::Rect_<float> temp_bb_test;
+        temp_bb_test.x = MAX(0, bb_test.x - col_ext_bb_test);
+        temp_bb_test.y = MAX(0, bb_test.y - row_ext_bb_test);
+        int t_right1 = MIN(width - 1, bb_test.x + bb_test.width);
+        int t_bottom1 = MIN(height - 1, bb_test.y + bb_test.height);
+        t_right1 = MIN(width, t_right1 + col_ext_bb_test);
+        t_bottom1 = MIN(height, t_bottom1 + row_ext_bb_test);
+        temp_bb_test.width = MAX(0, t_right1 - temp_bb_test.x - 1);
+        temp_bb_test.height = MAX(0, t_bottom1 - temp_bb_test.y - 1);
 
-    cv::Rect_<float> temp_bb_test;
-    temp_bb_test.x = MAX(0, bb_test.x - col_ext_bb_test);
-    temp_bb_test.y = MAX(0, bb_test.y - row_ext_bb_test);
-    int t_right1 = MIN(width - 1, bb_test.x + bb_test.width);
-    int t_bottom1 = MIN(height - 1, bb_test.y + bb_test.height);
-    t_right1 = MIN(width, t_right1 + col_ext_bb_test);
-    t_bottom1 = MIN(height, t_bottom1 + row_ext_bb_test);
-    temp_bb_test.width = MAX(0, t_right1 - temp_bb_test.x - 1);
-    temp_bb_test.height = MAX(0, t_bottom1 - temp_bb_test.y - 1);
+        float in = (temp_bb_test & temp_bb_gt).area();
+        float un = temp_bb_test.area() + temp_bb_gt.area() - in;
+        if (un < DBL_EPSILON) {
+            return 0.0;
+        }
+        return static_cast<double>(in / un);
+    } else if (method == 1) { // New method 1 = extending width-wise 0.5 and height-wise accroding to rc_ext
+        constexpr float rc_ext_divisor = 2.0;
+        int col_ext_bb_gt = int(bb_gt.width * 0.5);
+        int row_ext_bb_gt = int(bb_gt.height * rc_ext);
 
-    float in = (temp_bb_test & temp_bb_gt).area();
-    float un = temp_bb_test.area() + temp_bb_gt.area() - in;
+        cv::Rect_<float> temp_bb_gt;
+        temp_bb_gt.x = MAX(0, bb_gt.x - col_ext_bb_gt);
+        temp_bb_gt.y = MAX(0, bb_gt.y - row_ext_bb_gt);
+        int t_right = MIN(width - 1, bb_gt.x + bb_gt.width);
+        int t_bottom = MIN(height - 1, bb_gt.y + bb_gt.height);
+        t_right = MIN(width, t_right + col_ext_bb_gt);
+        t_bottom = MIN(height, t_bottom + row_ext_bb_gt);
+        temp_bb_gt.width = MAX(0, t_right - temp_bb_gt.x - 1);
+        temp_bb_gt.height = MAX(0, t_bottom - temp_bb_gt.y - 1);
 
-    if (un < DBL_EPSILON) {
-        return 0.0;
+        int col_ext_bb_test = int(bb_test.width * 0.5);
+        int row_ext_bb_test = int(bb_test.height * rc_ext);
+
+        cv::Rect_<float> temp_bb_test;
+        temp_bb_test.x = MAX(0, bb_test.x - col_ext_bb_test);
+        temp_bb_test.y = MAX(0, bb_test.y - row_ext_bb_test);
+        int t_right1 = MIN(width - 1, bb_test.x + bb_test.width);
+        int t_bottom1 = MIN(height - 1, bb_test.y + bb_test.height);
+        t_right1 = MIN(width, t_right1 + col_ext_bb_test);
+        t_bottom1 = MIN(height, t_bottom1 + row_ext_bb_test);
+        temp_bb_test.width = MAX(0, t_right1 - temp_bb_test.x - 1);
+        temp_bb_test.height = MAX(0, t_bottom1 - temp_bb_test.y - 1);
+
+        float in = (temp_bb_test & temp_bb_gt).area();
+        float un = temp_bb_test.area() + temp_bb_gt.area() - in;
+        if (un < DBL_EPSILON) {
+            return 0.0;
+        }
+        return static_cast<double>(in / un);
+    } else { // New method 2 = method 1 +
+        constexpr float rc_ext_divisor = 2.0;
+        int col_ext_bb_gt = int(bb_gt.width * width_multiplier);
+        int row_ext_bb_gt = int(bb_gt.height * rc_ext);
+
+        cv::Rect_<float> temp_bb_gt;
+        int fixed_extension = 5000;
+
+        temp_bb_gt.x = bb_gt.x - col_ext_bb_gt;
+        temp_bb_gt.y = bb_gt.y - row_ext_bb_gt;
+        int t_right = bb_gt.x + bb_gt.width;
+        int t_bottom = bb_gt.y + bb_gt.height;
+
+        t_right = t_right + col_ext_bb_gt;
+        t_bottom = t_bottom + row_ext_bb_gt;
+
+        temp_bb_gt.x = temp_bb_gt.x + fixed_extension;
+        temp_bb_gt.y = temp_bb_gt.y + fixed_extension;
+
+        t_right = t_right + fixed_extension;
+        t_bottom = t_bottom + fixed_extension;
+
+        temp_bb_gt.width = t_right - temp_bb_gt.x - 1;
+        temp_bb_gt.height = t_bottom - temp_bb_gt.y - 1;
+
+        int col_ext_bb_test = int(bb_test.width * width_multiplier);
+        int row_ext_bb_test = int(bb_test.height * rc_ext);
+
+        cv::Rect_<float> temp_bb_test;
+        temp_bb_test.x = bb_test.x - col_ext_bb_test;
+        temp_bb_test.y = bb_test.y - row_ext_bb_test;
+        int t_right1 = bb_test.x + bb_test.width;
+        int t_bottom1 = bb_test.y + bb_test.height;
+        t_right1 = t_right1 + col_ext_bb_test;
+        t_bottom1 = t_bottom1 + row_ext_bb_test;
+
+        temp_bb_test.x = temp_bb_test.x + fixed_extension;
+        temp_bb_test.y = temp_bb_test.y + fixed_extension;
+        t_right1 = t_right1 + fixed_extension;
+        t_bottom1 = t_bottom1 + fixed_extension;
+
+        temp_bb_test.width = MAX(0, t_right1 - temp_bb_test.x - 1);
+        temp_bb_test.height = MAX(0, t_bottom1 - temp_bb_test.y - 1);
+
+        float in = (temp_bb_test & temp_bb_gt).area();
+        float un = temp_bb_test.area() + temp_bb_gt.area() - in;
+        if (un < DBL_EPSILON) {
+            return 0.0;
+        }
+        return static_cast<double>(in / un);
     }
-
-    return static_cast<double>(in / un);
 }
 
 SortTracker::SortTracker(int max_age, int min_hits, double iou_threshold, bool show_msg)
@@ -67,7 +153,6 @@ SortTracker::~SortTracker() { _trackers.clear(); }
 std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::TrackingBox>& tracking_box_vec,
                                                       int height, int width)
 {
-    // _show_msg = true;
     if (_show_msg) {
         std::cout << "_max_age :: " << _max_age << "; _min_hits :: " << _min_hits
                   << "; _iou_threshold :: " << _iou_threshold << std::endl;
@@ -144,7 +229,8 @@ std::vector<vtpl::TrackingBox> SortTracker::getResult(const std::vector<vtpl::Tr
         for (unsigned int j = 0; j < detNum; j++) {
             // use 1-iou because the hungarian algorithm computes a minimum-cost assignment.
             if (_iou_mod) {
-                iouMatrix[i][j] = 1 - getModIOU(predictedBoxes[i], tracking_box_vec.at(j).rect, _rc_ext, height, width);
+                iouMatrix[i][j] = 1 - getModIOU(predictedBoxes[i], tracking_box_vec.at(j).rect, _rc_ext, height, width,
+                                                getIOUModMethod(), getWidthMultiplier());
             } else {
                 iouMatrix[i][j] = 1 - getIOU(predictedBoxes[i], tracking_box_vec.at(j).rect);
             }
@@ -266,4 +352,8 @@ double SortTracker::getIOUThreshold() const { return _iou_threshold; }
 float SortTracker::getRCExt() const { return _rc_ext; }
 bool SortTracker::getIOUMod() const { return _iou_mod; }
 bool SortTracker::getShowMsg() const { return _show_msg; }
+void SortTracker::setIOUModMethod(const int& method) { _iou_mod_method = method; }
+int SortTracker::getIOUModMethod() const { return _iou_mod_method; }
+void SortTracker::setWidthMultiplier(const float& factor) { _width_multiplier = factor; }
+float SortTracker::getWidthMultiplier() const { return _width_multiplier; }
 } // namespace vtpl

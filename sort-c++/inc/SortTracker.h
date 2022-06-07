@@ -39,6 +39,8 @@ class SortTracker
     int _frame_count;
 
     std::vector<KalmanTracker> _trackers;
+    int _iou_mod_method{0};
+    float _width_multiplier{0.5};
 
   public:
     SortTracker(int max_age, int min_hits, double iou_threshold, bool show_msg);
@@ -57,6 +59,10 @@ class SortTracker
     float getRCExt() const;
     bool getIOUMod() const;
     bool getShowMsg() const;
+    void setIOUModMethod(const int& method);
+    int getIOUModMethod() const;
+    void setWidthMultiplier(const float& factor);
+    float getWidthMultiplier() const;
 };
 
 } // namespace vtpl
