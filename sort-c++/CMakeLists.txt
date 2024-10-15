@@ -22,6 +22,8 @@ target_link_libraries(sort_cpp
   PUBLIC opencv_video
 )
 
+add_library(sort_cpp::sort_cpp ALIAS sort_cpp)
+
 # set_property(TARGET sort_cpp PROPERTY
 #   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
