@@ -33,8 +33,8 @@ class SortTracker
     int _max_age;
     int _min_hits;
     double _iou_threshold;
-    float _rc_ext{1.0};
-    bool _iou_mod{true};
+    float _rc_ext{0.0};
+    bool _iou_mod{false};
     bool _show_msg; // show message
     int _frame_count;
 
