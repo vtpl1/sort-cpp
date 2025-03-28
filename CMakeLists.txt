@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-set(VERSION 0.1.0)
+set(VERSION 0.2.0)
 
 project(sort-cpp
   VERSION ${VERSION}
