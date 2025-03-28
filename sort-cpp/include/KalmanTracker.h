@@ -4,12 +4,12 @@
 #ifndef KALMAN_H
 #define KALMAN_H
 
+#include "sort_cpp_export.h"
 #include <opencv2/opencv.hpp>
-
 using StateType = cv::Rect2f;
 
 // This class represents the internel state of individual tracked objects observed as bounding box.
-class KalmanTracker
+class SORT_CPP_EXPORT KalmanTracker
 {
   public:
     KalmanTracker(StateType initRect)

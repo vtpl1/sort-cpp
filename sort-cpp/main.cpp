@@ -32,7 +32,7 @@
 #include "KalmanTracker.h"
 #include "SortTracker.h"
 
-#include "opencv2/highgui/highgui.hpp"
+// #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
 // using TrackingBox = struct _TrackingBox {
