@@ -15,8 +15,8 @@
 
 #include <iostream>
 #include <vector>
-#include "sort_cpp_export.h"
-class SORT_CPP_EXPORT HungarianAlgorithm
+#include "sortcpp_export.h"
+class SORTCPP_EXPORT HungarianAlgorithm
 {
   public:
     HungarianAlgorithm() = default;

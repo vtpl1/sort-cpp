@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.17)
 set(VERSION 0.2.0)
 
-project(sort-cpp
+project(sortcpp
   VERSION ${VERSION}
-  DESCRIPTION "sort-cpp"
-  HOMEPAGE_URL "https://github.com/vtpl1/sort-cpp"
+  DESCRIPTION "sortcpp"
+  HOMEPAGE_URL "https://github.com/vtpl1/sortcpp"
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -14,4 +14,4 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 
-add_subdirectory(sort-cpp)
+add_subdirectory(sortcpp)

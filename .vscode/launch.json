@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "sort_cpp",
+            "name": "sortcpp",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/sort-cpp/sort_cpp_exe",
+            "program": "${workspaceFolder}/build/sortcpp/sortcpp_exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/sort-cpp/",
+            "cwd": "${workspaceFolder}/sortcpp/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -23,13 +23,13 @@
                 }
             ],
             "linux": {
-                "name": "sort_cpp",
+                "name": "sortcpp",
                 "type": "cppdbg",
                 "request": "launch",
-                "program": "${workspaceFolder}/build/sort-cpp/sort_cpp_exe",
+                "program": "${workspaceFolder}/build/sortcpp/sortcpp_exe",
                 "args": [],
                 "stopAtEntry": false,
-                "cwd": "${workspaceFolder}/sort-cpp/",
+                "cwd": "${workspaceFolder}/sortcpp/",
                 "environment": [],
                 "externalConsole": false,
                 "MIMode": "gdb",
@@ -42,13 +42,13 @@
                 ]
             },
             "windows": {
-                "name": "sort_cpp",
+                "name": "sortcpp",
                 "type": "cppvsdbg",
                 "request": "launch",
-                "program": "${workspaceFolder}/build/sort-cpp/Debug/sort_cpp_exe.exe",
+                "program": "${workspaceFolder}/build/sortcpp/Debug/sortcpp_exe.exe",
                 "args": [],
                 "stopAtEntry": false,
-                "cwd": "${workspaceFolder}/sort-cpp/",
+                "cwd": "${workspaceFolder}/sortcpp/",
                 "environment": [],
                 "externalConsole": false
             }

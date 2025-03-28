@@ -2,7 +2,7 @@
 #ifndef SortTracker_h
 #define SortTracker_h
 #include "KalmanTracker.h"
-#include "sort_cpp_export.h"
+#include "sortcpp_export.h"
 #include <opencv2/opencv.hpp>
 #include <vector>
 
@@ -17,7 +17,7 @@ namespace vtpl
 //     // int miss_count{0};
 // } TrackingBox;
 
-using TrackingBox = struct SORT_CPP_EXPORT _TrackingBox {
+using TrackingBox = struct SORTCPP_EXPORT _TrackingBox {
     _TrackingBox() = delete;
     //_TrackingBox(const cv::Rect& rect) : rect(rect.x, rect.y, rect.width, rect.height) {}
     _TrackingBox(const cv::Rect2f& rect) : rect(rect) {}
@@ -27,7 +27,7 @@ using TrackingBox = struct SORT_CPP_EXPORT _TrackingBox {
     // int miss_count{0};
 };
 
-class SORT_CPP_EXPORT SortTracker
+class SORTCPP_EXPORT SortTracker
 {
   private:
     int _max_age;
